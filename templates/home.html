@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diabetes Prediction</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-input {
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            box-shadow: 0 0 0 2px #3b82f6;
+            border-color: #3b82f6;
+        }
+        .predict-btn {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .modal-overlay {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-100 to-indigo-200">
+        <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-8 md:p-12 space-y-8">
+
+            <!-- Header Section -->
+            <div class="text-center">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Diabetes Prediction</h1>
+                <p class="mt-2 text-gray-600">Enter the details below to predict the likelihood of diabetes.</p>
+            </div>
+
+            <!-- Prediction Form -->
+            <form id="prediction-form" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Pregnancies -->
+                    <div>
+                        <label for="pregnancies" class="block text-sm font-medium text-gray-700">Pregnancies</label>
+                        <input type="number" id="pregnancies" name="pregnancies" required class="form-input mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g., 1">
+                    </div>
+                    <!-- Glucose -->
+                    <div>
+                        <label for="glucose" class="block text-sm font-medium text-gray-700">Glucose</label>
+                        <input type="number" id="glucose" name="glucose" required class="form-input mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g., 85">
+                    </div>
+                    <!-- Blood Pressure -->
+                    <div>
+                        <label for="bloodpressure" class="block text-sm font-medium text-gray-700">Blood Pressure</label>
+                        <input type="number" id="bloodpressure" name="bloodpressure" required class="form-input mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g., 66">
+                    </div>
+                    <!-- Skin Thickness -->
+                    <div>
+                        <label for="skinthickness" class="block text-sm font-medium text-gray-700">Skin Thickness</label>
+                        <input type="number" id="skinthickness" name="skinthickness" required class="form-input mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g., 29">
+                    </div>
+                    <!-- Insulin -->
+                    <div>
+                        <label for="insulin" class="block text-sm font-medium text-gray-700">Insulin</label>
+                        <input type="number" id="insulin" name="insulin" required class="form-input mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g., 0">
+                    </div>
+                    <!-- BMI -->
+                    <div>
+                        <label for="bmi" class="block text-sm font-medium text-gray-700">BMI</label>
+                        <input type="number" step="0.1" id="bmi" name="bmi" required class="form-input mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g., 26.6">
+                    </div>
+                    <!-- Diabetes Pedigree Function -->
+                    <div>
+                        <label for="dpf" class="block text-sm font-medium text-gray-700">Diabetes Pedigree Function</label>
+                        <input type="number" step="0.001" id="dpf" name="dpf" required class="form-input mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g., 0.351">
+                    </div>
+                    <!-- Age -->
+                    <div>
+                        <label for="age" class="block text-sm font-medium text-gray-700">Age</label>
+                        <input type="number" id="age" name="age" required class="form-input mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g., 31">
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center pt-4">
+                    <button type="submit" class="predict-btn w-full md:w-auto px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75">
+                        <span id="btn-text">Predict</span>
+                        <span id="btn-loader" class="hidden">
+                            <svg class="animate-spin h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Predicting...
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div id="result-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
+        <div class="modal-content bg-white rounded-2xl shadow-xl w-full max-w-md text-center p-8 transform scale-95">
+            <h2 id="modal-title" class="text-2xl font-bold mb-4">Prediction Result</h2>
+            <div id="modal-body" class="mb-6 text-lg">
+                <!-- Result will be inserted here -->
+            </div>
+            <button id="close-modal-btn" class="w-full px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('prediction-form');
+        const resultModal = document.getElementById('result-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const btnText = document.getElementById('btn-text');
+        const btnLoader = document.getElementById('btn-loader');
+
+        // Function to show the modal with the result
+        const showModal = (title, message, isError = false) => {
+            modalTitle.textContent = title;
+            modalBody.innerHTML = message;
+            modalTitle.className = isError ? 'text-2xl font-bold mb-4 text-red-600' : 'text-2xl font-bold mb-4 text-gray-800';
+            resultModal.classList.remove('hidden');
+            setTimeout(() => {
+                resultModal.querySelector('.modal-content').classList.remove('scale-95');
+                resultModal.classList.remove('opacity-0');
+            }, 10);
+        };
+
+        // Function to hide the modal
+        const hideModal = () => {
+            resultModal.querySelector('.modal-content').classList.add('scale-95');
+            resultModal.classList.add('opacity-0');
+            setTimeout(() => {
+                resultModal.classList.add('hidden');
+            }, 300);
+        };
+
+        // Event listener for form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Show loader
+            btnText.classList.add('hidden');
+            btnLoader.classList.remove('hidden');
+            const submitButton = form.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => {
+                // Ensure values are numbers
+                data[key] = parseFloat(value);
+            });
+
+            try {
+                // IMPORTANT: Replace '/predict' with the actual endpoint of your Flask app
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                // Display the result in the modal
+                if (result.prediction !== undefined) {
+                    const predictionText = result.prediction == 1 
+                        ? '<span class="font-bold text-red-600">High</span> likelihood of diabetes.' 
+                        : '<span class="font-bold text-green-600">Low</span> likelihood of diabetes.';
+                    const advice = result.prediction == 1
+                        ? '<p class="mt-4 text-sm text-gray-600">It is recommended to consult with a healthcare professional for further evaluation and advice.</p>'
+                        : '<p class="mt-4 text-sm text-gray-600">Continue to maintain a healthy lifestyle. Regular check-ups are always a good practice.</p>';
+                    
+                    showModal('Prediction Result', `${predictionText}${advice}`);
+                } else if(result.error) {
+                    showModal('Error', `<p class="text-red-500">${result.error}</p>`, true);
+                } else {
+                    throw new Error('Invalid response from server');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showModal('Prediction Failed', '<p class="text-red-500">Could not retrieve prediction. Please check the console for more details and ensure the backend server is running.</p>', true);
+            } finally {
+                // Hide loader
+                btnText.classList.remove('hidden');
+                btnLoader.classList.add('hidden');
+                submitButton.disabled = false;
+            }
+        });
+
+        // Event listeners for closing the modal
+        closeModalBtn.addEventListener('click', hideModal);
+        resultModal.addEventListener('click', (e) => {
+            if (e.target === resultModal) {
+                hideModal();
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !resultModal.classList.contains('hidden')) {
+                hideModal();
+            }
+        });
+
+    </script>
+</body>
+</html>

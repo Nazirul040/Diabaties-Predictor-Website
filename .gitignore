@@ -205,3 +205,13 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+#Virtual env
+myenv
+
+#ML Model
+model/diabetes_predictor.ipynb
+model/diabetes2.csv
+
+#static
+static

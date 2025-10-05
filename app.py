@@ -17,7 +17,7 @@ def hello_world():
 def predict():
     if model is None or scaler is None:
         return jsonify({'error': 'Model or scaler not loaded properly. Check server logs.'}), 500
-
+    data = request.get_json()
     try:
         features = [
             float(data['pregnancies']),
